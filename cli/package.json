@@ -1,0 +1,12 @@
+{
+    "name": "codevault-cli",
+    "version": "1.0.0",
+    "description": "CodeVault CLI - Git-like version control powered by Oracle Database",
+    "main": "index.js",
+    "bin": {
+        "cv": "./index.js"
+    },
+    "dependencies": {
+        "node-fetch": "^2.7.0"
+    }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "codevault-backend",
+  "version": "1.0.0",
+  "description": "CodeVault - GitHub-like VCS Backend",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "oracledb": "^6.7.0",
+    "diff": "^7.0.0",
+    "uuid": "^10.0.0"
+  }
+}

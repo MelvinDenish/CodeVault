@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api/client';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -19,7 +18,7 @@ export default function Navbar() {
 
   return (
     <nav style={{
-      background: 'var(--bg-secondary)',
+      background: 'rgba(17, 25, 22, 0.85)',
       borderBottom: '1px solid var(--border-color)',
       padding: '0 24px',
       height: '64px',
@@ -29,18 +28,19 @@ export default function Navbar() {
       position: 'sticky',
       top: 0,
       zIndex: 50,
-      backdropFilter: 'blur(12px)',
+      backdropFilter: 'blur(16px)',
     }}>
       {/* Left */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
           <div style={{
-            width: '32px', height: '32px', borderRadius: '8px',
-            background: 'var(--gradient-blue)',
+            width: '34px', height: '34px', borderRadius: '10px',
+            background: 'var(--gradient-primary)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '18px', fontWeight: 800, color: 'white'
+            fontSize: '18px', fontWeight: 800, color: 'white',
+            boxShadow: '0 4px 16px rgba(16, 185, 129, 0.3)',
           }}>⟨⟩</div>
-          <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
+          <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
             CodeVault
           </span>
         </Link>
@@ -63,8 +63,8 @@ export default function Navbar() {
                 outline: 'none',
                 transition: 'border-color 0.2s, width 0.3s',
               }}
-              onFocus={(e) => e.target.style.width = '360px'}
-              onBlur={(e) => e.target.style.width = '280px'}
+              onFocus={(e) => { e.target.style.width = '360px'; e.target.style.borderColor = 'var(--accent-green)'; }}
+              onBlur={(e) => { e.target.style.width = '280px'; e.target.style.borderColor = 'var(--border-color)'; }}
             />
             <span style={{
               position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
@@ -87,14 +87,14 @@ export default function Navbar() {
                 onClick={() => setShowMenu(!showMenu)}
                 style={{
                   width: '34px', height: '34px', borderRadius: '50%',
-                  background: 'var(--gradient-purple)',
+                  background: 'var(--gradient-primary)',
                   border: '2px solid var(--border-color)',
                   color: 'white', fontWeight: 700, fontSize: '14px',
                   cursor: 'pointer', display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', transition: 'border-color 0.2s',
+                  justifyContent: 'center', transition: 'border-color 0.2s, box-shadow 0.2s',
                 }}
-                onMouseEnter={(e) => e.target.style.borderColor = 'var(--accent-purple)'}
-                onMouseLeave={(e) => e.target.style.borderColor = 'var(--border-color)'}
+                onMouseEnter={(e) => { e.target.style.borderColor = 'var(--accent-green)'; e.target.style.boxShadow = '0 0 12px rgba(16,185,129,0.3)'; }}
+                onMouseLeave={(e) => { e.target.style.borderColor = 'var(--border-color)'; e.target.style.boxShadow = 'none'; }}
               >
                 {user.username?.[0]?.toUpperCase() || 'U'}
               </button>

@@ -20,11 +20,11 @@ async function createPR(req, res) {
   try {
     const result = await conn.execute(
       `INSERT INTO pull_requests (repo_id, title, description, source_branch, target_branch, author_id)
-       VALUES (:rid, :title, :desc, :src, :tgt, :uid)
+       VALUES (:rid, :title, :desc, :src, :tgt, :author_id)
        RETURNING pr_id INTO :prid`,
       {
         rid: repoId, title, desc: description || null,
-        src: sourceBranchId, tgt: targetBranchId, uid: userId,
+        src: sourceBranchId, tgt: targetBranchId, author_id: userId,
         prid: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
       }
     );
@@ -163,8 +163,8 @@ async function mergePR(req, res) {
     const conflicts = detectConflicts(sourceFiles, targetFiles);
 
     if (conflicts.length > 0) {
-      return res.json({ 
-        merged: false, 
+      return res.json({
+        merged: false,
         conflicts: conflicts.map(c => c.filePath),
         message: 'Merge conflicts detected'
       });
@@ -186,8 +186,8 @@ async function mergePR(req, res) {
     // Log activity
     await conn.execute(
       `INSERT INTO activity_logs (user_id, repo_id, action, details)
-       VALUES (:uid, :rid, 'merge', 'Merged PR #' || :prid)`,
-      { uid: req.user.id, rid: repoId, prid: prId }
+       VALUES (:merge_user, :rid, 'merge', 'Merged PR #' || :prid)`,
+      { merge_user: req.user.id, rid: repoId, prid: prId }
     );
 
     await conn.commit();

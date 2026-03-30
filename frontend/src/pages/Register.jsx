@@ -36,7 +36,7 @@ export default function Register() {
     <div style={{
       minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center',
       justifyContent: 'center', padding: '20px',
-      background: 'radial-gradient(ellipse at top, rgba(137,87,229,0.08) 0%, transparent 60%)',
+      background: 'radial-gradient(ellipse at top, rgba(167,139,250,0.06) 0%, transparent 60%)',
     }}>
       <div className="fade-in" style={{ width: '100%', maxWidth: '420px' }}>
         <div style={{ textAlign: 'center', marginBottom: '36px' }}>
@@ -55,8 +55,8 @@ export default function Register() {
           <form onSubmit={handleSubmit}>
             {error && (
               <div style={{
-                padding: '10px 14px', background: 'rgba(248,81,73,0.1)',
-                border: '1px solid rgba(248,81,73,0.3)', borderRadius: '8px',
+                padding: '10px 14px', background: 'rgba(239,68,68,0.1)',
+                border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px',
                 color: 'var(--accent-red)', fontSize: '13px', marginBottom: '20px',
               }}>{error}</div>
             )}
@@ -94,7 +94,7 @@ export default function Register() {
 
         <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px', color: 'var(--text-secondary)' }}>
           Already have an account?{' '}
-          <Link to="/login" style={{ color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: 500 }}>
+          <Link to="/login" style={{ color: 'var(--accent-green)', textDecoration: 'none', fontWeight: 500 }}>
             Sign in
           </Link>
         </p>

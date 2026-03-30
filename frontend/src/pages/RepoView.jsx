@@ -74,15 +74,15 @@ export default function RepoView() {
   }
 
   async function loadIssues() {
-    try { setIssues(await api.listIssues(id)); } catch(e) { console.error(e); }
+    try { setIssues(await api.listIssues(id)); } catch (e) { console.error(e); }
   }
 
   async function loadPRs() {
-    try { setPrs(await api.listPRs(id)); } catch(e) { console.error(e); }
+    try { setPrs(await api.listPRs(id)); } catch (e) { console.error(e); }
   }
 
   async function loadActivity() {
-    try { setActivity(await api.getActivity(id)); } catch(e) { console.error(e); }
+    try { setActivity(await api.getActivity(id)); } catch (e) { console.error(e); }
   }
 
   useEffect(() => {
@@ -306,8 +306,10 @@ export default function RepoView() {
               <button className="btn btn-ghost btn-sm" onClick={() => setSelectedFile(null)}
                 style={{ marginBottom: '12px' }}>← Back to files</button>
               <div className="card-flat" style={{ padding: 0, overflow: 'hidden' }}>
-                <div style={{ padding: '12px 16px', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)',
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{
+                  padding: '12px 16px', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                }}>
                   <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '13px' }}>{selectedFile.filePath}</span>
                   <span className="badge badge-blue">{Math.round((selectedFile.fileSize || 0) / 1024 * 100) / 100} KB</span>
                 </div>
@@ -318,8 +320,10 @@ export default function RepoView() {
                 }}>
                   {selectedFile.content?.split('\n').map((line, i) => (
                     <div key={i} style={{ display: 'flex' }}>
-                      <span style={{ width: '45px', textAlign: 'right', paddingRight: '16px',
-                        color: 'var(--text-muted)', userSelect: 'none', flexShrink: 0 }}>{i + 1}</span>
+                      <span style={{
+                        width: '45px', textAlign: 'right', paddingRight: '16px',
+                        color: 'var(--text-muted)', userSelect: 'none', flexShrink: 0
+                      }}>{i + 1}</span>
                       <span>{line}</span>
                     </div>
                   ))}
@@ -337,7 +341,7 @@ export default function RepoView() {
                     borderBottom: i < files.length - 1 ? '1px solid var(--border-color)' : 'none',
                     transition: 'background 0.15s',
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(88,166,255,0.05)'}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(16,185,129,0.05)'}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <span style={{ fontSize: '14px' }}>📄</span>
@@ -354,168 +358,179 @@ export default function RepoView() {
             </div>
           )}
         </div>
-      )}
+      )
+      }
 
-      {activeTab === 'commits' && (
-        <div className="fade-in" style={{ display: 'grid', gap: '8px' }}>
-          {commits.length === 0 ? (
-            <div className="empty-state"><div style={{ fontSize: '48px' }}>💾</div><p>No commits yet</p></div>
-          ) : commits.map(c => (
-            <Link key={c.commitId} to={`/commit/${c.commitId}`} className="card" style={{ textDecoration: 'none', padding: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>{c.message}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {c.authorName} committed on {new Date(c.commitTime).toLocaleString()}
+      {
+        activeTab === 'commits' && (
+          <div className="fade-in" style={{ display: 'grid', gap: '8px' }}>
+            {commits.length === 0 ? (
+              <div className="empty-state"><div style={{ fontSize: '48px' }}>💾</div><p>No commits yet</p></div>
+            ) : commits.map(c => (
+              <Link key={c.commitId} to={`/commit/${c.commitId}`} className="card" style={{ textDecoration: 'none', padding: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>{c.message}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                      {c.authorName} committed on {new Date(c.commitTime).toLocaleString()}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span className="badge badge-blue" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                      {c.commitHash}
+                    </span>
+                    <span className="badge badge-purple">{c.fileCount} files</span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span className="badge badge-blue" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                    {c.commitHash}
-                  </span>
-                  <span className="badge badge-purple">{c.fileCount} files</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'branches' && (
-        <div className="fade-in" style={{ display: 'grid', gap: '8px' }}>
-          {branches.map(br => (
-            <div key={br.branchId} className="card-flat" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '16px' }}>🌿</span>
-                <span style={{ fontWeight: 600 }}>{br.branchName}</span>
-                {br.isDefault && <span className="badge badge-green">default</span>}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {br.headCommitHash && (
-                  <span className="badge badge-blue" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px' }}>
-                    {br.headCommitHash}
-                  </span>
-                )}
-                {br.headMessage && <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{br.headMessage}</span>}
-                {!br.isDefault && isOwner && (
-                  <button className="btn btn-ghost btn-sm" style={{ color: 'var(--accent-red)' }}
-                    onClick={() => handleDeleteBranch(br.branchId)}>🗑️</button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'prs' && (
-        <div className="fade-in">
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600 }}>Pull Requests</h3>
-            <button className="btn btn-primary btn-sm" onClick={() => setShowNewPR(true)}>＋ New Pull Request</button>
+              </Link>
+            ))}
           </div>
-          {showNewPR && (
-            <div className="card-flat fade-in" style={{ marginBottom: '16px', padding: '20px' }}>
-              <input className="input-field" placeholder="PR Title" value={prTitle}
-                onChange={(e) => setPrTitle(e.target.value)} style={{ marginBottom: '8px' }} />
-              <textarea className="input-field" placeholder="Description (optional)" value={prDesc}
-                onChange={(e) => setPrDesc(e.target.value)} style={{ marginBottom: '8px' }} />
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                <select className="input-field" value={prSource} onChange={(e) => setPrSource(e.target.value)}>
-                  <option value="">Source branch</option>
-                  {branches.map(b => <option key={b.branchId} value={b.branchId}>{b.branchName}</option>)}
-                </select>
-                <span style={{ alignSelf: 'center', color: 'var(--text-muted)' }}>→</span>
-                <select className="input-field" value={prTarget} onChange={(e) => setPrTarget(e.target.value)}>
-                  <option value="">Target branch</option>
-                  {branches.map(b => <option key={b.branchId} value={b.branchId}>{b.branchName}</option>)}
-                </select>
-              </div>
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <button className="btn btn-ghost btn-sm" onClick={() => setShowNewPR(false)}>Cancel</button>
-                <button className="btn btn-success btn-sm" onClick={handleCreatePR}>Create PR</button>
-              </div>
-            </div>
-          )}
-          {prs.length === 0 ? (
-            <div className="empty-state"><div style={{ fontSize: '48px' }}>🔀</div><p>No open pull requests</p></div>
-          ) : prs.map(pr => (
-            <Link key={pr.prId} to={`/pr/${pr.prId}`} className="card" style={{ textDecoration: 'none', marginBottom: '8px', display: 'block' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>#{pr.prId} {pr.title}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {pr.authorName} wants to merge {pr.sourceBranchName} → {pr.targetBranchName}
-                  </div>
+        )
+      }
+
+      {
+        activeTab === 'branches' && (
+          <div className="fade-in" style={{ display: 'grid', gap: '8px' }}>
+            {branches.map(br => (
+              <div key={br.branchId} className="card-flat" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '16px' }}>🌿</span>
+                  <span style={{ fontWeight: 600 }}>{br.branchName}</span>
+                  {br.isDefault && <span className="badge badge-green">default</span>}
                 </div>
-                <span className={`badge ${pr.status === 'open' ? 'badge-green' : pr.status === 'merged' ? 'badge-purple' : 'badge-red'}`}>
-                  {pr.status}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  {br.headCommitHash && (
+                    <span className="badge badge-blue" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px' }}>
+                      {br.headCommitHash}
+                    </span>
+                  )}
+                  {br.headMessage && <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{br.headMessage}</span>}
+                  {!br.isDefault && isOwner && (
+                    <button className="btn btn-ghost btn-sm" style={{ color: 'var(--accent-red)' }}
+                      onClick={() => handleDeleteBranch(br.branchId)}>🗑️</button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        activeTab === 'prs' && (
+          <div className="fade-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 600 }}>Pull Requests</h3>
+              <button className="btn btn-primary btn-sm" onClick={() => setShowNewPR(true)}>＋ New Pull Request</button>
+            </div>
+            {showNewPR && (
+              <div className="card-flat fade-in" style={{ marginBottom: '16px', padding: '20px' }}>
+                <input className="input-field" placeholder="PR Title" value={prTitle}
+                  onChange={(e) => setPrTitle(e.target.value)} style={{ marginBottom: '8px' }} />
+                <textarea className="input-field" placeholder="Description (optional)" value={prDesc}
+                  onChange={(e) => setPrDesc(e.target.value)} style={{ marginBottom: '8px' }} />
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                  <select className="input-field" value={prSource} onChange={(e) => setPrSource(e.target.value)}>
+                    <option value="">Source branch</option>
+                    {branches.map(b => <option key={b.branchId} value={b.branchId}>{b.branchName}</option>)}
+                  </select>
+                  <span style={{ alignSelf: 'center', color: 'var(--text-muted)' }}>→</span>
+                  <select className="input-field" value={prTarget} onChange={(e) => setPrTarget(e.target.value)}>
+                    <option value="">Target branch</option>
+                    {branches.map(b => <option key={b.branchId} value={b.branchId}>{b.branchName}</option>)}
+                  </select>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setShowNewPR(false)}>Cancel</button>
+                  <button className="btn btn-success btn-sm" onClick={handleCreatePR}>Create PR</button>
+                </div>
+              </div>
+            )}
+            {prs.length === 0 ? (
+              <div className="empty-state"><div style={{ fontSize: '48px' }}>🔀</div><p>No open pull requests</p></div>
+            ) : prs.map(pr => (
+              <Link key={pr.prId} to={`/pr/${pr.prId}`} className="card" style={{ textDecoration: 'none', marginBottom: '8px', display: 'block' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>#{pr.prId} {pr.title}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                      {pr.authorName} wants to merge {pr.sourceBranchName} → {pr.targetBranchName}
+                    </div>
+                  </div>
+                  <span className={`badge ${pr.status === 'open' ? 'badge-green' : pr.status === 'merged' ? 'badge-purple' : 'badge-red'}`}>
+                    {pr.status}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        activeTab === 'issues' && (
+          <div className="fade-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 600 }}>Issues</h3>
+              <button className="btn btn-primary btn-sm" onClick={() => setShowNewIssue(true)}>＋ New Issue</button>
+            </div>
+            {showNewIssue && (
+              <div className="card-flat fade-in" style={{ marginBottom: '16px', padding: '20px' }}>
+                <input className="input-field" placeholder="Issue title" value={newIssueTitle}
+                  onChange={(e) => setNewIssueTitle(e.target.value)} style={{ marginBottom: '8px' }} />
+                <textarea className="input-field" placeholder="Describe the issue..." value={newIssueDesc}
+                  onChange={(e) => setNewIssueDesc(e.target.value)} style={{ marginBottom: '12px' }} />
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setShowNewIssue(false)}>Cancel</button>
+                  <button className="btn btn-success btn-sm" onClick={handleCreateIssue}>Submit</button>
+                </div>
+              </div>
+            )}
+            {issues.length === 0 ? (
+              <div className="empty-state"><div style={{ fontSize: '48px' }}>🐛</div><p>No open issues</p></div>
+            ) : issues.map(issue => (
+              <Link key={issue.issueId} to={`/issue/${issue.issueId}`} className="card"
+                style={{ textDecoration: 'none', marginBottom: '8px', display: 'block' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px' }}>#{issue.issueId} {issue.title}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                      opened by {issue.createdByName} · {issue.commentCount} comments
+                    </div>
+                  </div>
+                  <span className={`badge ${issue.status === 'open' ? 'badge-green' : 'badge-red'}`}>{issue.status}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        activeTab === 'activity' && (
+          <div className="fade-in" style={{ display: 'grid', gap: '8px' }}>
+            {activity.length === 0 ? (
+              <div className="empty-state"><div style={{ fontSize: '48px' }}>📊</div><p>No activity yet</p></div>
+            ) : activity.map(a => (
+              <div key={a.logId} className="card-flat" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '16px' }}>
+                  {a.action === 'commit' ? '💾' : a.action === 'pull_request' ? '🔀' : a.action === 'merge' ? '🔗' : a.action === 'fork' ? '🍴' : '📌'}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontWeight: 500 }}>{a.username}</span>
+                  <span style={{ color: 'var(--text-secondary)', marginLeft: '8px' }}>{a.details}</span>
+                </div>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  {new Date(a.actionTime).toLocaleString()}
                 </span>
               </div>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'issues' && (
-        <div className="fade-in">
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600 }}>Issues</h3>
-            <button className="btn btn-primary btn-sm" onClick={() => setShowNewIssue(true)}>＋ New Issue</button>
+            ))}
           </div>
-          {showNewIssue && (
-            <div className="card-flat fade-in" style={{ marginBottom: '16px', padding: '20px' }}>
-              <input className="input-field" placeholder="Issue title" value={newIssueTitle}
-                onChange={(e) => setNewIssueTitle(e.target.value)} style={{ marginBottom: '8px' }} />
-              <textarea className="input-field" placeholder="Describe the issue..." value={newIssueDesc}
-                onChange={(e) => setNewIssueDesc(e.target.value)} style={{ marginBottom: '12px' }} />
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <button className="btn btn-ghost btn-sm" onClick={() => setShowNewIssue(false)}>Cancel</button>
-                <button className="btn btn-success btn-sm" onClick={handleCreateIssue}>Submit</button>
-              </div>
-            </div>
-          )}
-          {issues.length === 0 ? (
-            <div className="empty-state"><div style={{ fontSize: '48px' }}>🐛</div><p>No open issues</p></div>
-          ) : issues.map(issue => (
-            <Link key={issue.issueId} to={`/issue/${issue.issueId}`} className="card"
-              style={{ textDecoration: 'none', marginBottom: '8px', display: 'block' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '14px' }}>#{issue.issueId} {issue.title}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                    opened by {issue.createdByName} · {issue.commentCount} comments
-                  </div>
-                </div>
-                <span className={`badge ${issue.status === 'open' ? 'badge-green' : 'badge-red'}`}>{issue.status}</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'activity' && (
-        <div className="fade-in" style={{ display: 'grid', gap: '8px' }}>
-          {activity.length === 0 ? (
-            <div className="empty-state"><div style={{ fontSize: '48px' }}>📊</div><p>No activity yet</p></div>
-          ) : activity.map(a => (
-            <div key={a.logId} className="card-flat" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: '16px' }}>
-                {a.action === 'commit' ? '💾' : a.action === 'pull_request' ? '🔀' : a.action === 'merge' ? '🔗' : a.action === 'fork' ? '🍴' : '📌'}
-              </span>
-              <div style={{ flex: 1 }}>
-                <span style={{ fontWeight: 500 }}>{a.username}</span>
-                <span style={{ color: 'var(--text-secondary)', marginLeft: '8px' }}>{a.details}</span>
-              </div>
-              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                {new Date(a.actionTime).toLocaleString()}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+        )
+      }
 
       {/* Toast */}
       {toast && <div className={`toast toast-${toast.type}`}>{toast.msg}</div>}
-    </div>
+    </div >
   );
 }

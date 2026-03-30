@@ -13,11 +13,11 @@ async function createIssue(req, res) {
   try {
     const result = await conn.execute(
       `INSERT INTO issues (repo_id, title, description, created_by, assignee_id)
-       VALUES (:rid, :title, :desc, :uid, :aid)
+       VALUES (:rid, :title, :desc, :creator_id, :aid)
        RETURNING issue_id INTO :iid`,
       {
         rid: repoId, title, desc: description || null,
-        uid: userId, aid: assigneeId || null,
+        creator_id: userId, aid: assigneeId || null,
         iid: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
       }
     );
@@ -178,10 +178,10 @@ async function addComment(req, res) {
   try {
     const result = await conn.execute(
       `INSERT INTO issue_comments (issue_id, user_id, body)
-       VALUES (:iid, :uid, :body)
+       VALUES (:iid, :commenter_id, :body)
        RETURNING comment_id INTO :cid`,
       {
-        iid: issueId, uid: userId, body,
+        iid: issueId, commenter_id: userId, body,
         cid: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
       }
     );

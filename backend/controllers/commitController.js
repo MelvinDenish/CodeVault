@@ -48,47 +48,23 @@ async function createCommit(req, res) {
 
     const newCommitId = commitResult.outBinds.cid[0];
 
-    // Store files with content-addressable storage (dedup by hash)
+    // Store files with content-addressable storage
     for (const file of files) {
-      const fileHash = crypto.createHash('sha256').update(file.content).digest('hex');
-      const fileSize = Buffer.byteLength(file.content, 'utf8');
+      const content = file.content || '';
+      const fileHash = crypto.createHash('sha256').update(content).digest('hex');
+      const fileSize = Buffer.byteLength(content, 'utf8');
 
-      // Check for existing hash (deduplication check - log only, still store for history)
-      const existingHash = await conn.execute(
-        `SELECT file_id FROM files WHERE file_hash = :hash AND ROWNUM = 1`,
-        { hash: fileHash }
+      await conn.execute(
+        `INSERT INTO files (commit_id, file_path, file_hash, file_content, file_size)
+         VALUES (:cid, :fpath, :fhash, :fcontent, :fsize)`,
+        {
+          cid: newCommitId,
+          fpath: file.path,
+          fhash: fileHash,
+          fcontent: { val: content, type: oracledb.DB_TYPE_CLOB },
+          fsize: fileSize
+        }
       );
-
-      if (existingHash.rows.length > 0) {
-        // Dedup: reference existing content but still create file record for this commit
-        const existingContent = await conn.execute(
-          `SELECT file_content FROM files WHERE file_id = :fid`,
-          { fid: existingHash.rows[0][0] }
-        );
-        await conn.execute(
-          `INSERT INTO files (commit_id, file_path, file_hash, file_content, file_size)
-           VALUES (:cid, :path, :hash, :content, :size)`,
-          {
-            cid: newCommitId,
-            path: file.path,
-            hash: fileHash,
-            content: file.content,
-            size: fileSize
-          }
-        );
-      } else {
-        await conn.execute(
-          `INSERT INTO files (commit_id, file_path, file_hash, file_content, file_size)
-           VALUES (:cid, :path, :hash, :content, :size)`,
-          {
-            cid: newCommitId,
-            path: file.path,
-            hash: fileHash,
-            content: file.content,
-            size: fileSize
-          }
-        );
-      }
     }
 
     // Update branch HEAD
