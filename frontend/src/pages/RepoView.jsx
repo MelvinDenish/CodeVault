@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 export default function RepoView() {
   const { id } = useParams();
@@ -39,9 +39,18 @@ export default function RepoView() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  useEffect(() => { loadRepo(); }, [id]);
+  const loadBranchData = useCallback(async (branchId) => {
+    try {
+      const [commitData, fileData] = await Promise.all([
+        api.listCommits(id, branchId),
+        api.getFiles(id, branchId)
+      ]);
+      setCommits(commitData);
+      setFiles(fileData.files || []);
+    } catch (err) { console.error(err); }
+  }, [id]);
 
-  async function loadRepo() {
+  const loadRepo = useCallback(async () => {
     setLoading(true);
     try {
       const [repoData, branchData] = await Promise.all([
@@ -60,36 +69,27 @@ export default function RepoView() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [id, loadBranchData]);
 
-  async function loadBranchData(branchId) {
-    try {
-      const [commitData, fileData] = await Promise.all([
-        api.listCommits(id, branchId),
-        api.getFiles(id, branchId)
-      ]);
-      setCommits(commitData);
-      setFiles(fileData.files || []);
-    } catch (err) { console.error(err); }
-  }
+  useEffect(() => { loadRepo(); }, [loadRepo]);
 
-  async function loadIssues() {
+  const loadIssues = useCallback(async () => {
     try { setIssues(await api.listIssues(id)); } catch (e) { console.error(e); }
-  }
+  }, [id]);
 
-  async function loadPRs() {
+  const loadPRs = useCallback(async () => {
     try { setPrs(await api.listPRs(id)); } catch (e) { console.error(e); }
-  }
+  }, [id]);
 
-  async function loadActivity() {
+  const loadActivity = useCallback(async () => {
     try { setActivity(await api.getActivity(id)); } catch (e) { console.error(e); }
-  }
+  }, [id]);
 
   useEffect(() => {
     if (activeTab === 'issues') loadIssues();
     if (activeTab === 'prs') loadPRs();
     if (activeTab === 'activity') loadActivity();
-  }, [activeTab]);
+  }, [activeTab, loadActivity, loadIssues, loadPRs]);
 
   async function handleCreateBranch() {
     if (!newBranchName.trim()) return;

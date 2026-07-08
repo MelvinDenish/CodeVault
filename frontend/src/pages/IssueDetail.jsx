@@ -1,23 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../api/client';
-import { useAuth } from '../context/AuthContext';
 
 export default function IssueDetail() {
   const { id } = useParams();
-  const { user } = useAuth();
   const [issue, setIssue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState('');
 
-  useEffect(() => {
-    loadIssue();
-  }, [id]);
-
-  async function loadIssue() {
+  const loadIssue = useCallback(async () => {
     try { setIssue(await api.getIssue(id)); } catch(e) { console.error(e); }
     finally { setLoading(false); }
-  }
+  }, [id]);
+
+  useEffect(() => {
+    loadIssue();
+  }, [loadIssue]);
 
   const handleComment = async () => {
     if (!comment.trim()) return;
