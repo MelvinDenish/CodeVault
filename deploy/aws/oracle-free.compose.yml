@@ -1,0 +1,17 @@
+services:
+  oracle:
+    image: gvenzl/oracle-free:23-slim
+    container_name: codevault-oracle
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1521:1521"
+    environment:
+      ORACLE_PASSWORD: "${ORACLE_PASSWORD:-change-me}"
+      APP_USER: "${ORACLE_USER:-codevault}"
+      APP_USER_PASSWORD: "${ORACLE_PASSWORD:-change-me}"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    shm_size: "1g"
+
+volumes:
+  oracle-data:
