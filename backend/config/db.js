@@ -6,20 +6,35 @@ require('dotenv').config();
 
 let pool;
 
+function numberFromEnv(name, fallback) {
+  const value = Number.parseInt(process.env[name], 10);
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function shouldInitializeSchema() {
+  return process.env.INIT_SCHEMA !== 'false';
+}
+
 async function initDB() {
   try {
     pool = await oracledb.createPool({
       user: process.env.ORACLE_USER || 'system',
       password: process.env.ORACLE_PASSWORD || 'oracle',
       connectionString: process.env.ORACLE_CONNECTION_STRING || 'localhost:1521/FREE',
-      poolMin: 2,
-      poolMax: 10,
-      poolIncrement: 1
+      poolMin: numberFromEnv('ORACLE_POOL_MIN', 0),
+      poolMax: numberFromEnv('ORACLE_POOL_MAX', 4),
+      poolIncrement: numberFromEnv('ORACLE_POOL_INCREMENT', 1),
+      poolTimeout: numberFromEnv('ORACLE_POOL_TIMEOUT', 60),
+      queueTimeout: numberFromEnv('ORACLE_QUEUE_TIMEOUT', 10000)
     });
     console.log('✅ Oracle connection pool created');
-    
-    // Initialize schema
-    await initSchema();
+
+    if (shouldInitializeSchema()) {
+      await initSchema();
+    } else {
+      console.log('Schema initialization skipped');
+    }
+
     return pool;
   } catch (err) {
     console.error('❌ Oracle connection failed:', err.message);
