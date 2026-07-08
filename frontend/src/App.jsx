@@ -1,27 +1,33 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
 import Navbar from './components/Navbar';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import NewRepo from './pages/NewRepo';
-import RepoView from './pages/RepoView';
-import CommitDetail from './pages/CommitDetail';
-import PRDetail from './pages/PRDetail';
-import IssueDetail from './pages/IssueDetail';
-import Explore from './pages/Explore';
-import Search from './pages/Search';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
 
-function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
-  if (loading) return (
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const NewRepo = lazy(() => import('./pages/NewRepo'));
+const RepoView = lazy(() => import('./pages/RepoView'));
+const CommitDetail = lazy(() => import('./pages/CommitDetail'));
+const PRDetail = lazy(() => import('./pages/PRDetail'));
+const IssueDetail = lazy(() => import('./pages/IssueDetail'));
+const Explore = lazy(() => import('./pages/Explore'));
+const Search = lazy(() => import('./pages/Search'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Settings = lazy(() => import('./pages/Settings'));
+
+function PageFallback() {
+  return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 64px)' }}>
       <div className="skeleton" style={{ width: '200px', height: '40px' }} />
     </div>
   );
+}
+
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return <PageFallback />;
   return user ? children : <Navigate to="/login" />;
 }
 
@@ -97,21 +103,23 @@ function AppRoutes() {
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/new" element={<ProtectedRoute><NewRepo /></ProtectedRoute>} />
-        <Route path="/repo/:id" element={<ProtectedRoute><RepoView /></ProtectedRoute>} />
-        <Route path="/repo/:id/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        <Route path="/commit/:id" element={<ProtectedRoute><CommitDetail /></ProtectedRoute>} />
-        <Route path="/pr/:id" element={<ProtectedRoute><PRDetail /></ProtectedRoute>} />
-        <Route path="/issue/:id" element={<ProtectedRoute><IssueDetail /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      </Routes>
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/new" element={<ProtectedRoute><NewRepo /></ProtectedRoute>} />
+          <Route path="/repo/:id" element={<ProtectedRoute><RepoView /></ProtectedRoute>} />
+          <Route path="/repo/:id/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/commit/:id" element={<ProtectedRoute><CommitDetail /></ProtectedRoute>} />
+          <Route path="/pr/:id" element={<ProtectedRoute><PRDetail /></ProtectedRoute>} />
+          <Route path="/issue/:id" element={<ProtectedRoute><IssueDetail /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        </Routes>
+      </Suspense>
     </>
   );
 }
