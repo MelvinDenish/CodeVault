@@ -289,6 +289,74 @@ async function initSchema() {
       }
     }
 
+    const indexes = [
+      {
+        name: 'IDX_REPOS_OWNER_CREATED',
+        sql: 'CREATE INDEX idx_repos_owner_created ON repositories(owner_id, created_at DESC)'
+      },
+      {
+        name: 'IDX_REPOS_VISIBILITY_CREATED',
+        sql: 'CREATE INDEX idx_repos_visibility_created ON repositories(visibility, created_at DESC)'
+      },
+      {
+        name: 'IDX_BRANCHES_REPO_NAME',
+        sql: 'CREATE INDEX idx_branches_repo_name ON branches(repo_id, branch_name)'
+      },
+      {
+        name: 'IDX_COMMITS_REPO_TIME',
+        sql: 'CREATE INDEX idx_commits_repo_time ON commits(repo_id, commit_time DESC)'
+      },
+      {
+        name: 'IDX_COMMITS_REPO_BRANCH_TIME',
+        sql: 'CREATE INDEX idx_commits_repo_branch_time ON commits(repo_id, branch_id, commit_time DESC)'
+      },
+      {
+        name: 'IDX_FILES_COMMIT_PATH',
+        sql: 'CREATE INDEX idx_files_commit_path ON files(commit_id, file_path)'
+      },
+      {
+        name: 'IDX_ISSUES_REPO_STATUS_CREATED',
+        sql: 'CREATE INDEX idx_issues_repo_status_created ON issues(repo_id, status, created_at DESC)'
+      },
+      {
+        name: 'IDX_ISSUE_COMMENTS_ISSUE_CREATED',
+        sql: 'CREATE INDEX idx_issue_comments_issue_created ON issue_comments(issue_id, created_at)'
+      },
+      {
+        name: 'IDX_PRS_REPO_STATUS_CREATED',
+        sql: 'CREATE INDEX idx_prs_repo_status_created ON pull_requests(repo_id, status, created_at DESC)'
+      },
+      {
+        name: 'IDX_COLLAB_REPO_USER',
+        sql: 'CREATE INDEX idx_collab_repo_user ON collaborators(repo_id, user_id)'
+      },
+      {
+        name: 'IDX_ACTIVITY_REPO_TIME',
+        sql: 'CREATE INDEX idx_activity_repo_time ON activity_logs(repo_id, action_time DESC)'
+      },
+      {
+        name: 'IDX_STARS_REPO',
+        sql: 'CREATE INDEX idx_stars_repo ON stars(repo_id)'
+      }
+    ];
+
+    for (const index of indexes) {
+      try {
+        const check = await conn.execute(
+          `SELECT COUNT(*) AS cnt FROM user_indexes WHERE index_name = :name`,
+          { name: index.name }
+        );
+        if (check.rows[0][0] === 0) {
+          await conn.execute(index.sql);
+          console.log(`  Created index: ${index.name}`);
+        }
+      } catch (err) {
+        if (err.errorNum !== 955) {
+          console.error(`  Error creating index ${index.name}:`, err.message);
+        }
+      }
+    }
+
     await conn.commit();
     console.log('✅ Schema initialization complete');
   } catch (err) {
