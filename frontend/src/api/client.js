@@ -1,4 +1,9 @@
-const API_BASE = '/api';
+export function normalizeApiBase(value = '/api') {
+  const normalized = (value || '/api').trim().replace(/\/+$/, '');
+  return normalized || '/api';
+}
+
+const API_BASE = normalizeApiBase(import.meta.env?.VITE_API_BASE_URL);
 
 function getToken() {
   return localStorage.getItem('codevault_token');
@@ -13,10 +18,11 @@ async function request(method, path, body = null) {
   if (body) options.body = JSON.stringify(body);
 
   const res = await fetch(`${API_BASE}${path}`, options);
-  const data = await res.json();
+  const contentType = res.headers.get('content-type') || '';
+  const data = contentType.includes('application/json') ? await res.json() : null;
   
   if (!res.ok) {
-    throw new Error(data.error || 'Request failed');
+    throw new Error(data?.error || `Request failed (${res.status})`);
   }
   return data;
 }

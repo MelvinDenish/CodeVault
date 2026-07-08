@@ -2,18 +2,37 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 
+const EMPTY_RESULTS = { repos: [], users: [] };
+
 export default function Search() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [results, setResults] = useState({ repos: [], users: [] });
-  const [loading, setLoading] = useState(true);
+  const [searchState, setSearchState] = useState({
+    query: '',
+    results: EMPTY_RESULTS,
+  });
 
   useEffect(() => {
-    if (query) {
-      setLoading(true);
-      api.search(query).then(setResults).catch(console.error).finally(() => setLoading(false));
-    }
+    if (!query) return undefined;
+
+    let cancelled = false;
+    api.search(query)
+      .then(results => {
+        if (!cancelled) setSearchState({ query, results });
+      })
+      .catch(err => {
+        console.error(err);
+        if (!cancelled) setSearchState({ query, results: EMPTY_RESULTS });
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [query]);
+
+  const hasCurrentResults = searchState.query === query;
+  const results = query && hasCurrentResults ? searchState.results : EMPTY_RESULTS;
+  const loading = Boolean(query && !hasCurrentResults);
 
   return (
     <div className="fade-in" style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px' }}>

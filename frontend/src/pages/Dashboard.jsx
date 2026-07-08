@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { api } from '../api/client';
 
 export default function Dashboard() {
@@ -12,11 +12,6 @@ export default function Dashboard() {
   useEffect(() => {
     api.listRepos().then(setRepos).catch(console.error).finally(() => setLoading(false));
   }, []);
-
-  const langColors = {
-    js: '#f1e05a', py: '#3572A5', java: '#b07219', ts: '#3178c6',
-    html: '#e34c26', css: '#563d7c', go: '#00ADD8', default: '#8b949e'
-  };
 
   return (
     <div className="fade-in" style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>

@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
-import { useAuth } from '../context/AuthContext';
 
 export default function Settings() {
     const { id } = useParams();
-    const { user } = useAuth();
     const navigate = useNavigate();
     const [repo, setRepo] = useState(null);
     const [name, setName] = useState('');
@@ -23,11 +21,7 @@ export default function Settings() {
         setTimeout(() => setToast(null), 3000);
     };
 
-    useEffect(() => {
-        loadData();
-    }, [id]);
-
-    async function loadData() {
+    const loadData = useCallback(async () => {
         try {
             const [repoData, collabData] = await Promise.all([
                 api.getRepo(id),
@@ -43,7 +37,11 @@ export default function Settings() {
         } finally {
             setLoading(false);
         }
-    }
+    }, [id]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     async function handleSave() {
         try {

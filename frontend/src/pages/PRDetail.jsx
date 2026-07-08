@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { api } from '../api/client';
 
 export default function PRDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [pr, setPr] = useState(null);
   const [loading, setLoading] = useState(true);
   const [merging, setMerging] = useState(false);
